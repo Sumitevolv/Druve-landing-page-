@@ -6,8 +6,6 @@
     <title>LeadGenPro - Get More Booked Appointments</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sheetjs@x.x.x/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -1552,10 +1550,18 @@
 
         // Contact Form Handling
         const contactForm = document.getElementById('contactForm');
-        let formSubmissions = JSON.parse(localStorage.getItem('contactSubmissions')) || [];
-
+        
+        // Google Apps Script URL - Replace with your actual Google Apps Script URL
+        const scriptURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = contactForm.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
             
             // Get form data
             const formData = {
@@ -1564,37 +1570,36 @@
                 phone: document.getElementById('phone').value,
                 service: document.getElementById('service').value,
                 message: document.getElementById('message').value,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                source: 'LeadGenPro Website'
             };
             
-            // Add to submissions array
-            formSubmissions.push(formData);
-            
-            // Save to localStorage
-            localStorage.setItem('contactSubmissions', JSON.stringify(formSubmissions));
-            
-            // Show success message
-            alert('Thank you for your message! We will get back to you soon.');
-            
-            // Reset form
-            contactForm.reset();
-            
-            // Update Excel file
-            updateExcelFile();
+            // Send data to Google Apps Script
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                // Show success message
+                alert('Thank you for your message! We will get back to you soon.');
+                
+                // Reset form
+                contactForm.reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error sending your message. Please try again or contact us directly.');
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
         });
-
-        // Function to update Excel file with form submissions
-        function updateExcelFile() {
-            // Create worksheet from form submissions
-            const ws = XLSX.utils.json_to_sheet(formSubmissions);
-            
-            // Create workbook and add the worksheet
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Contact Submissions");
-            
-            // Generate Excel file and trigger download
-            XLSX.writeFile(wb, "contact_submissions.xlsx");
-        }
 
         // Scroll Animations
         const observerOptions = {
@@ -1652,4 +1657,3 @@
     </script>
 </body>
 </html>
-
