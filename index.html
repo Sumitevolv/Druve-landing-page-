@@ -1310,7 +1310,7 @@
         <div class="container bio-content">
             <div class="bio-image">
                 <!-- Fixed: Using placeholder image instead of missing Druve.jpg -->
-                <img src="Druve.jpg" alt="Professional Headshot">
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" alt="Professional Headshot">
             </div>
             <div class="bio-text">
                 <h2>About Me</h2>
@@ -1426,16 +1426,16 @@
                     </div>
                     <p>We help mortgage brokers and real estate agents get more qualified appointments and increase closings through targeted lead generation systems.</p>
                     <div class="social-links">
-                        <a href="https://www.facebook.com/share/1KGup3Z2pp/?mibextid=wwXIfr" class="social-link">
+                        <a href="https://www.facebook.com/share/1KGup3Z2pp/?mibextid=wwXIfr" class="social-link" target="_blank">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="social-link">
+                        <a href="https://x.com/DhruvChhippi" class="social-link" target="_blank">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://www.instagram.com/dhru.vchhippi?igsh=MTRja25sbGM4MDBuNA%3D%3D&utm_source=qr" class="social-link">
+                        <a href="https://www.instagram.com/dhru.vchhippi?igsh=MTRja25sbGM4MDBuNA%3D%3D&utm_source=qr" class="social-link" target="_blank">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="social-link">
+                        <a href="https://www.linkedin.com/in/dhruv-chhippi-5b5a0b283/" class="social-link" target="_blank">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
                     </div>
@@ -1551,7 +1551,8 @@
         // Contact Form Handling
         const contactForm = document.getElementById('contactForm');
         
-        // Google Apps Script URL - Replace with your actual Google Apps Script URL
+        // Correct Google Apps Script URL - Replace with your actual Google Apps Script Web App URL
+        // IMPORTANT: You need to create and deploy a Google Apps Script as a web app
         const scriptURL = 'https://docs.google.com/spreadsheets/d/1BSS3OyVjW9mQKggp7D8dPWbbIIrShTlk6tl8Ttc0Xtk/edit?usp=sharing';
         
         contactForm.addEventListener('submit', function(e) {
@@ -1564,31 +1565,30 @@
             submitBtn.disabled = true;
             
             // Get form data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                service: document.getElementById('service').value,
-                message: document.getElementById('message').value,
-                timestamp: new Date().toISOString(),
-                source: 'LeadGenPro Website'
-            };
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('phone', document.getElementById('phone').value);
+            formData.append('service', document.getElementById('service').value);
+            formData.append('message', document.getElementById('message').value);
+            formData.append('timestamp', new Date().toISOString());
+            formData.append('source', 'Flexoraai Website');
             
             // Send data to Google Apps Script
             fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+                body: formData
             })
-            .then(() => {
-                // Show success message
-                alert('Thank you for your message! We will get back to you soon.');
-                
-                // Reset form
-                contactForm.reset();
+            .then(response => {
+                if (response.ok) {
+                    // Show success message
+                    alert('Thank you for your message! We will get back to you soon.');
+                    
+                    // Reset form
+                    contactForm.reset();
+                } else {
+                    throw new Error('Network response was not ok');
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -1657,5 +1657,3 @@
     </script>
 </body>
 </html>
-
-
